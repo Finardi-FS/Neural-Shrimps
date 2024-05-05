@@ -1,3 +1,6 @@
 NN-venv/
 .vscode/
 Neural_Network/__pycache__/
+__pycache__/
+/Machine_Learning/__pycache__/
+*.mat
