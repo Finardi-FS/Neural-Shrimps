@@ -464,9 +464,17 @@ class NN_Class:
 
 	def __init__(self):
 		self._learning_rate = 0.9
-	
+
+
+# ----------------------------------------------------------------------------- #
+
+
 	def Sigmoid(self, x):
 		return 1 / (1 + np.exp(-x))
+
+
+# ----------------------------------------------------------------------------- #
+
 
 	def SGD_method(self, weights, dataset, correct_outputs, LR = None):
 																	# weight:           vettore dei pesi relativi alle feature
@@ -493,6 +501,10 @@ class NN_Class:
 		return weights
 
 
+# ----------------------------------------------------------------------------- #
+
+
+
 	def training(self, weights, inputs, correct_outputs, epochs, LR = None):
 		self._weights_per_epoch = np.array([weights])
 
@@ -507,7 +519,11 @@ class NN_Class:
 				"epochs"            : epochs,
 				"inputs"            : inputs
 			}
-	
+
+
+# ----------------------------------------------------------------------------- #
+
+
 	def testing(self, inputs, weights = None):
 		if not weights:
 			weights = self._weights_per_epoch[-1]
@@ -516,6 +532,10 @@ class NN_Class:
 			weighted_sum = weights @ inputs[k]  # Prodotto scalare tra pesi allenati e input
 			pred_outputs = np.append(pred_outputs, self.Sigmoid(weighted_sum)) 
 		return pred_outputs
+
+
+# ----------------------------------------------------------------------------- #
+
 
 	def plt_epochs(self, results, idx_sample):    
 
@@ -541,3 +561,39 @@ class NN_Class:
 		plt.plot(np.arange(1, results['epochs']+1), 2*(P - E))
 		plt.title(f'(sample #{idx_sample})')
 		plt.show()
+
+
+# ----------------------------------------------------------------------------- #
+
+
+	def data_folding(self, K, Nsamples, show_kfold = False):
+		
+		folds = [fold for others, fold in KFold(n_splits = K, shuffle = True).split(np.arange(Nsamples))]
+
+		def indxs(folds, N):
+			indices = np.arange(N)
+			for i in range(K):
+				for j in folds[i]:
+					indices[j] = i
+			return indices
+
+		indices = indxs(folds, Nsamples)
+
+		if show_kfold:
+			jp('### Indici delle fold associate a ciascun campione:')
+			jp(indices)
+		return (K, indices)
+
+
+# ----------------------------------------------------------------------------- #
+
+
+	def table_kfolds(self, dic: dict):
+		jp(pd.DataFrame(
+			dic.values(), 
+			index = dic.keys(), 
+			columns = ['(K: {})'.format(str(i)+' of '+str(len(dic['FP']))) 
+			  			for i in range(1,len(dic['FP'])+1)]))
+
+
+# ----------------------------------------------------------------------------- #
