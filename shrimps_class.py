@@ -504,7 +504,7 @@ class NN_Class:
 	def training(self, weights, inputs, correct_outputs, epochs, LR = None):
 		self._weights_per_epoch = np.array([weights])
 
-		for e in range(epochs-1):
+		for e in range(epochs): #epochs-1
 
 			weights = self.SGD_method(weights, inputs, correct_outputs, LR)
 			self._weights_per_epoch = np.vstack((self._weights_per_epoch, weights))
@@ -525,7 +525,7 @@ class NN_Class:
 
 		plt.figure(figsize=(15,8))
 
-		P = self.Sigmoid(results['container_weights'] @ results['inputs'][idx_sample])
+		P = self.Sigmoid(results['container_weights'][1:] @ results['inputs'][idx_sample])
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
 
 		plt.subplot(1,2,1)
