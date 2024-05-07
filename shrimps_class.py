@@ -611,4 +611,4 @@ class NN_Class:
 			if correct_outputs[k] == 0 and predicted >= 0.5:
 				metrics['FP'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
 
-		return (pred_outputs, metrics)
+		return (inputs, correct_outputs, pred_outputs, metrics)
