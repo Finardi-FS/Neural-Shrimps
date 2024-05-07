@@ -152,6 +152,9 @@ class PCA_Class:
 		except:
 			print(f"L'autovettore con indice {idx_evec} non esiste.")
 
+
+
+
 # ///////////////////////////////////////////////////////////////////////////// #
 # Class for Machine Learning 
 # ///////////////////////////////////////////////////////////////////////////// #
@@ -465,16 +468,12 @@ class NN_Class:
 	def __init__(self):
 		self._learning_rate = 0.9
 
-
 # ----------------------------------------------------------------------------- #
-
 
 	def Sigmoid(self, x):
 		return 1 / (1 + np.exp(-x))
 
-
 # ----------------------------------------------------------------------------- #
-
 
 	def SGD_method(self, weights, dataset, correct_outputs, LR = None):
 																	# weight:           vettore dei pesi relativi alle feature
@@ -500,10 +499,7 @@ class NN_Class:
 		self._final_weights = weights
 		return weights
 
-
 # ----------------------------------------------------------------------------- #
-
-
 
 	def training(self, weights, inputs, correct_outputs, epochs, LR = None):
 		self._weights_per_epoch = np.array([weights])
@@ -520,22 +516,7 @@ class NN_Class:
 				"inputs"            : inputs
 			}
 
-
 # ----------------------------------------------------------------------------- #
-
-
-	def testing(self, inputs, weights = None):
-		if not weights:
-			weights = self._weights_per_epoch[-1]
-		pred_outputs = np.empty((1,0))
-		for k in range(len(inputs)):                       
-			weighted_sum = weights @ inputs[k]  # Prodotto scalare tra pesi allenati e input
-			pred_outputs = np.append(pred_outputs, self.Sigmoid(weighted_sum)) 
-		return pred_outputs
-
-
-# ----------------------------------------------------------------------------- #
-
 
 	def plt_epochs(self, results, idx_sample):    
 
@@ -562,9 +543,7 @@ class NN_Class:
 		plt.title(f'(sample #{idx_sample})')
 		plt.show()
 
-
 # ----------------------------------------------------------------------------- #
-
 
 	def data_folding(self, K, Nsamples, show_kfold = False):
 		
@@ -584,9 +563,7 @@ class NN_Class:
 			jp(indices)
 		return (K, indices)
 
-
 # ----------------------------------------------------------------------------- #
-
 
 	def table_kfolds(self, dic: dict):
 		jp(pd.DataFrame(
@@ -595,5 +572,43 @@ class NN_Class:
 			columns = ['(K: {})'.format(str(i)+' of '+str(len(dic['FP']))) 
 			  			for i in range(1,len(dic['FP'])+1)]))
 
-
 # ----------------------------------------------------------------------------- #
+
+	def testing(self, inputs, correct_outputs, weights = None):
+		if not weights:
+			weights = self._weights_per_epoch[-1]
+
+		pred_outputs 	= np.empty((1,0))
+		metrics			= {
+			'accuracy'    : 0,
+			'sensitivity' : 0,
+			'specificity' : 0,
+			'FP'          : 0,
+			'FN'          : 0
+		}			
+
+
+		for k in range(len(inputs)):                       
+			weighted_sum = weights @ inputs[k]  # Prodotto scalare tra pesi allenati e input
+			predicted = self.Sigmoid(weighted_sum)
+			pred_outputs = np.append(pred_outputs, predicted) 
+
+			# Caso 0 -> Negative
+			if correct_outputs[k] == 0 and predicted < 0.5:
+				metrics['accuracy'] += 1 / len(correct_outputs)
+				metrics['specificity'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
+
+			# Caso 1 -> Positive
+			if correct_outputs[k] == 1 and predicted >= 0.5:
+				metrics['accuracy'] += 1 / len(correct_outputs)
+				metrics['sensitivity'] += 1 / np.sum(correct_outputs)
+
+			# Caso 1 -> Negative
+			if correct_outputs[k] == 1 and predicted < 0.5:
+				metrics['FN'] += 1 / np.sum(correct_outputs)
+
+			# Caso 0 -> Positive
+			if correct_outputs[k] == 0 and predicted >= 0.5:
+				metrics['FP'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
+
+		return (pred_outputs, metrics)
