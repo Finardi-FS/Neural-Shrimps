@@ -508,12 +508,17 @@ class NN_Class:
 
 			weights = self.SGD_method(weights, inputs, correct_outputs, LR)
 			self._weights_per_epoch = np.vstack((self._weights_per_epoch, weights))
+		lin_comb 				= (self._weights_per_epoch @ inputs.T).T
+		P = self.Sigmoid(lin_comb)
+		E = np.tile(correct_outputs, (epochs+1,1)).T
 
 		return {
 				"container_weights" : self._weights_per_epoch,
 				"correct_outputs"  	: correct_outputs,
 				"epochs"            : epochs,
-				"inputs"            : inputs
+				"inputs"            : inputs,
+				"P"					: P,
+				"E"					: E
 			}
 
 # ----------------------------------------------------------------------------- #
@@ -525,7 +530,7 @@ class NN_Class:
 
 		plt.figure(figsize=(15,8))
 
-		P = self.Sigmoid(results['container_weights'][1:] @ results['inputs'][idx_sample])
+		P = self.Sigmoid(results['container_weights'] @ results['inputs'][idx_sample])
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
 
 		plt.subplot(1,2,1)
@@ -539,7 +544,7 @@ class NN_Class:
 
 		plt.subplot(1,2,2)
 		plt.grid()
-		plt.plot(np.arange(1, results['epochs']+1), 2*(P - E))
+		plt.plot(np.arange(1, results['epochs']+2), 2*(P - E))
 		plt.title(f'(sample #{idx_sample})')
 		plt.show()
 
@@ -547,16 +552,20 @@ class NN_Class:
 
 	def data_folding(self, K, Nsamples, show_kfold = False):
 		
-		folds = [fold for others, fold in KFold(n_splits = K, shuffle = True).split(np.arange(Nsamples))]
+		if K == 1:
+			indices = [np.ones(Nsamples, dtype=int)]
+			
+		else:
+			folds = [fold for others, fold in KFold(n_splits = K, shuffle = True).split(np.arange(Nsamples))]
 
-		def indxs(folds, N):
-			indices = np.arange(N)
-			for i in range(K):
-				for j in folds[i]:
-					indices[j] = i
-			return indices
+			def indcs(folds, N):
+				indices = np.arange(N)
+				for i in range(K):
+					for j in folds[i]:
+						indices[j] = i
+				return indices
 
-		indices = indxs(folds, Nsamples)
+			indices = indcs(folds, Nsamples)
 
 		if show_kfold:
 			jp('### Indici delle fold associate a ciascun campione:')
@@ -575,7 +584,7 @@ class NN_Class:
 # ----------------------------------------------------------------------------- #
 
 	def testing(self, inputs, correct_outputs, weights = None):
-		if not weights:
+		if weights is None:
 			weights = self._weights_per_epoch[-1]
 
 		pred_outputs 	= np.empty((1,0))
@@ -612,3 +621,13 @@ class NN_Class:
 				metrics['FP'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
 
 		return (inputs, correct_outputs, pred_outputs, metrics)
+	
+	def trend_over_epochs(self, inputs, correct_outputs, weights_per_epoch):
+		P = np.empty(len(weights_per_epoch), dtype=object)
+		for i in range(1, len(weights_per_epoch)+1):
+			P[i-1] = self.testing(inputs, correct_outputs, weights_per_epoch[:i][0])[2]
+			E = np.tile(correct_outputs, (len(weights_per_epoch),1)).T
+		return {
+			"P" : P,
+			"E" : E 
+		}
