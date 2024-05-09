@@ -634,3 +634,52 @@ class NN_Class:
 			"P" : P,
 			"E" : E 
 		}
+	
+
+
+class DL_Class:
+
+	def __init__(self):
+		self._learning_rate = 0.9
+
+# ----------------------------------------------------------------------------- #
+
+	def Sigmoid(self, x):
+		return 1 / (1 + np.exp(-x))
+	
+# ----------------------------------------------------------------------------- #
+
+	def ReLU(self, x):
+		return max(0,x)
+	
+# ----------------------------------------------------------------------------- #
+
+	def Softmax(self, x: np.array):
+		exp = np.exp(x)
+		return exp / np.sum(exp)
+
+# ----------------------------------------------------------------------------- #
+
+	def SGD_method(self, weights, dataset, correct_outputs, LR = None):
+																	# weight:           vettore dei pesi relativi alle feature
+																	# f_input:          dataset contenente i valori delle feature per ciascun campione
+																	# correct_output:   vettore dei valori attesi per ciascun campione
+																	# LR:               learning rate
+		if not LR:
+			LR = self._learning_rate
+
+		for k in range(len(dataset)):                                   # ciclo sui campioni
+			
+			sample = dataset[k]                                         # prendo i valori delle feature del k-esimo campione
+			expected = correct_outputs[k]                                # prendo il valore atteso del k-esimo campione
+			lin_comb = weights @ sample                                 # combinazione lineare delle feature pesate per il k-esimo campione
+			predicted = self.Sigmoid(lin_comb)                               # normalizzazione della comb. lin. attraverso la funzione Sigmoid         
+			cost_function_der = 2 * (predicted - expected)              # derivata della funzione di costo (rispetto alla variabile predicted) 
+																		# relativa alla metrica Squared Error Cost                         
+			sigmoid_der = predicted * (1 - predicted)                   # derivata del sigmoid rispetto a lin_comb
+			lc_der = sample                                             # vettore di derivate di lin_comb rispetto ai pesi w (e al bias b)
+
+			dWeights = LR * cost_function_der * sigmoid_der * lc_der    # termine differenziale di aggiustamento per ricavare i nuovi pesi
+			weights -= dWeights                                         # correzione dei pesi
+		self._final_weights = weights
+		return weights
