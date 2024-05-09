@@ -583,10 +583,9 @@ class NN_Class:
 
 # ----------------------------------------------------------------------------- #
 
-	def testing(self, inputs, correct_outputs, weights = None):
+	def testing(self, inputs, correct_outputs, weights = None, K = 1):
 		if weights is None:
 			weights = self._weights_per_epoch[-1]
-
 		pred_outputs 	= np.empty((1,0))
 		metrics			= {
 			'accuracy'    : 0,
