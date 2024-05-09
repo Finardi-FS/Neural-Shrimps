@@ -508,7 +508,7 @@ class NN_Class:
 
 			weights = self.SGD_method(weights, inputs, correct_outputs, LR)
 			self._weights_per_epoch = np.vstack((self._weights_per_epoch, weights))
-		lin_comb 				= (self._weights_per_epoch @ inputs.T).T
+		lin_comb = (self._weights_per_epoch @ inputs.T).T
 		P = self.Sigmoid(lin_comb)
 		E = np.tile(correct_outputs, (epochs+1,1)).T
 
@@ -621,12 +621,15 @@ class NN_Class:
 				metrics['FP'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
 
 		return (inputs, correct_outputs, pred_outputs, metrics)
-	
+
+
+
 	def trend_over_epochs(self, inputs, correct_outputs, weights_per_epoch):
-		P = np.empty(len(weights_per_epoch), dtype=object)
+		P = np.empty((len(inputs),0))
 		for i in range(1, len(weights_per_epoch)+1):
-			P[i-1] = self.testing(inputs, correct_outputs, weights_per_epoch[:i][0])[2]
-			E = np.tile(correct_outputs, (len(weights_per_epoch),1)).T
+			pred_per_sample = self.testing(inputs, correct_outputs, weights_per_epoch[:i][-1])[2]
+			P = np.hstack((P, np.array([pred_per_sample]).T))
+		E = np.tile(correct_outputs, (len(weights_per_epoch),1)).T
 		return {
 			"P" : P,
 			"E" : E 
