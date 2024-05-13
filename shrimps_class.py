@@ -489,6 +489,7 @@ class NN_Class:
 			expected = correct_outputs[k]                                # prendo il valore atteso del k-esimo campione
 			lin_comb = weights @ sample                                 # combinazione lineare delle feature pesate per il k-esimo campione
 			predicted = self.Sigmoid(lin_comb)                               # normalizzazione della comb. lin. attraverso la funzione Sigmoid         
+			
 			cost_function_der = 2 * (predicted - expected)              # derivata della funzione di costo (rispetto alla variabile predicted) 
 																		# relativa alla metrica Squared Error Cost                         
 			sigmoid_der = predicted * (1 - predicted)                   # derivata del sigmoid rispetto a lin_comb
