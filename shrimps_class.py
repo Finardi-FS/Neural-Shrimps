@@ -534,7 +534,7 @@ class NN_Class:
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
 
 		plt.subplot(1,2,1)
-		x = np.linspace(0, 1, 1000)  
+		x = np.linspace(0, P[0]+0.1, 1000)  
 		x0 = results['correct_outputs'][idx_sample]
 		plt.grid()
 		plt.plot(x, cost_func(x, x0))
@@ -649,7 +649,8 @@ class DL_Class:
 # ----------------------------------------------------------------------------- #
 
 	def ReLU(self, x):
-		return max(0,x)
+		x[x < 0] = 0
+		return x
 	
 # ----------------------------------------------------------------------------- #
 
@@ -659,26 +660,46 @@ class DL_Class:
 
 # ----------------------------------------------------------------------------- #
 
-	def SGD_method(self, weights, dataset, correct_outputs, LR = None):
-																	# weight:           vettore dei pesi relativi alle feature
-																	# f_input:          dataset contenente i valori delle feature per ciascun campione
-																	# correct_output:   vettore dei valori attesi per ciascun campione
-																	# LR:               learning rate
-		if not LR:
-			LR = self._learning_rate
-
-		for k in range(len(dataset)):                                   # ciclo sui campioni
+	def DeepLearning(weights_per_layer, input_image, correct_outputs):
+		alpha = 0.01																# set parameters for adjustment of weights
+		N = 5
+		for k in range(N):															# start cycle for training (N is the number of input matrices for training)
+			reshaped_input_image = input_image[:,:,k].reshape(25, 1)				# convert k matrix into array
 			
-			sample = dataset[k]                                         # prendo i valori delle feature del k-esimo campione
-			expected = correct_outputs[k]                                # prendo il valore atteso del k-esimo campione
-			lin_comb = weights @ sample                                 # combinazione lineare delle feature pesate per il k-esimo campione
-			predicted = self.Sigmoid(lin_comb)                               # normalizzazione della comb. lin. attraverso la funzione Sigmoid         
-			cost_function_der = 2 * (predicted - expected)              # derivata della funzione di costo (rispetto alla variabile predicted) 
-																		# relativa alla metrica Squared Error Cost                         
-			sigmoid_der = predicted * (1 - predicted)                   # derivata del sigmoid rispetto a lin_comb
-			lc_der = sample                                             # vettore di derivate di lin_comb rispetto ai pesi w (e al bias b)
-
-			dWeights = LR * cost_function_der * sigmoid_der * lc_der    # termine differenziale di aggiustamento per ricavare i nuovi pesi
-			weights -= dWeights                                         # correzione dei pesi
-		self._final_weights = weights
-		return weights
+			input_of_hidden_layer1 = np.dot(w1, reshaped_input_Image)				# first hidden layer
+			output_of_hidden_layer1 = np.maximum(0, input_of_hidden_layer1)			# activation function (i.e. ReLU)
+			
+			input_of_hidden_layer2 = np.dot(w2, output_of_hidden_layer1)			# second hidden layer
+			output_of_hidden_layer2 = np.maximum(0, input_of_hidden_layer2)
+			
+			input_of_hidden_layer3 = np.dot(w3, output_of_hidden_layer2)			# third hidden layer
+			output_of_hidden_layer3 = np.maximum(0, input_of_hidden_layer3)
+			
+			input_of_output_node = np.dot(w4, output_of_hidden_layer3)				# output layer
+			final_output = np.exp(input_of_output_node) / np.sum(np.exp(input_of_output_node))  # Softmax activation
+			
+			correct_Output_transpose = correct_Output[k,:].T
+			error = correct_Output_transpose - final_output							# error in classification
+			
+			delta = error
+			
+			error_of_hidden_layer3 = np.dot(w4.T, delta)                          # back-propagation to correct weights
+			delta3 = (input_of_hidden_layer3 > 0) * error_of_hidden_layer3
+			
+			error_of_hidden_layer2 = np.dot(w3.T, delta3)
+			delta2 = (input_of_hidden_layer2 > 0) * error_of_hidden_layer2
+			
+			error_of_hidden_layer1 = np.dot(w2.T, delta2)
+			delta1 = (input_of_hidden_layer1 > 0) * error_of_hidden_layer1
+			
+			adjustment_of_w4 = alpha * np.dot(delta, output_of_hidden_layer3.T)
+			adjustment_of_w3 = alpha * np.dot(delta3, output_of_hidden_layer2.T)
+			adjustment_of_w2 = alpha * np.dot(delta2, output_of_hidden_layer1.T)
+			adjustment_of_w1 = alpha * np.dot(delta1, reshaped_input_Image.T)
+			
+			w1 = w1 + adjustment_of_w1
+			w2 = w2 + adjustment_of_w2
+			w3 = w3 + adjustment_of_w3
+			w4 = w4 + adjustment_of_w4
+		
+		return w1, w2, w3, w4
