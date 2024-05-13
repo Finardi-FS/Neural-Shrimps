@@ -534,7 +534,7 @@ class NN_Class:
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
 
 		plt.subplot(1,2,1)
-		x = np.linspace(0, 1, 1000)  
+		x = np.linspace(0, 1.2*P[0], 1000)  
 		x0 = results['correct_outputs'][idx_sample]
 		plt.grid()
 		plt.plot(x, cost_func(x, x0))
