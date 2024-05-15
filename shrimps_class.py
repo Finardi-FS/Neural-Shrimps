@@ -650,13 +650,13 @@ class DL_Class:
 # ----------------------------------------------------------------------------- #
 
 	def ReLU(self, x):
-		y = np.copy(x)
-		y[y < 0] = 0
-		return y
+		return np.maximum(0, x)
 	
 # ----------------------------------------------------------------------------- #
 
 	def Softmax(self, x: np.array):
+		# exp = np.exp(x - np.max(x))  # Sottrarre il massimo valore per stabilizzare l'output
+		# return exp / np.sum(exp)
 		exp = np.exp(x)
 		return exp / np.sum(exp)
 
