@@ -650,8 +650,9 @@ class DL_Class:
 # ----------------------------------------------------------------------------- #
 
 	def ReLU(self, x):
-		x[x < 0] = 0
-		return x
+		y = np.copy(x)
+		y[y < 0] = 0
+		return y
 	
 # ----------------------------------------------------------------------------- #
 
@@ -660,47 +661,3 @@ class DL_Class:
 		return exp / np.sum(exp)
 
 # ----------------------------------------------------------------------------- #
-
-	def DeepLearning(weights_per_layer, input_image, correct_outputs):
-		alpha = 0.01																# set parameters for adjustment of weights
-		N = 5
-		for k in range(N):															# start cycle for training (N is the number of input matrices for training)
-			reshaped_input_image = input_image[:,:,k].reshape(25, 1)				# convert k matrix into array
-			
-			input_of_hidden_layer1 = np.dot(w1, reshaped_input_Image)				# first hidden layer
-			output_of_hidden_layer1 = np.maximum(0, input_of_hidden_layer1)			# activation function (i.e. ReLU)
-			
-			input_of_hidden_layer2 = np.dot(w2, output_of_hidden_layer1)			# second hidden layer
-			output_of_hidden_layer2 = np.maximum(0, input_of_hidden_layer2)
-			
-			input_of_hidden_layer3 = np.dot(w3, output_of_hidden_layer2)			# third hidden layer
-			output_of_hidden_layer3 = np.maximum(0, input_of_hidden_layer3)
-			
-			input_of_output_node = np.dot(w4, output_of_hidden_layer3)				# output layer
-			final_output = np.exp(input_of_output_node) / np.sum(np.exp(input_of_output_node))  # Softmax activation
-			
-			correct_Output_transpose = correct_Output[k,:].T
-			error = correct_Output_transpose - final_output							# error in classification
-			
-			delta = error
-			
-			error_of_hidden_layer3 = np.dot(w4.T, delta)                          # back-propagation to correct weights
-			delta3 = (input_of_hidden_layer3 > 0) * error_of_hidden_layer3
-			
-			error_of_hidden_layer2 = np.dot(w3.T, delta3)
-			delta2 = (input_of_hidden_layer2 > 0) * error_of_hidden_layer2
-			
-			error_of_hidden_layer1 = np.dot(w2.T, delta2)
-			delta1 = (input_of_hidden_layer1 > 0) * error_of_hidden_layer1
-			
-			adjustment_of_w4 = alpha * np.dot(delta, output_of_hidden_layer3.T)
-			adjustment_of_w3 = alpha * np.dot(delta3, output_of_hidden_layer2.T)
-			adjustment_of_w2 = alpha * np.dot(delta2, output_of_hidden_layer1.T)
-			adjustment_of_w1 = alpha * np.dot(delta1, reshaped_input_Image.T)
-			
-			w1 = w1 + adjustment_of_w1
-			w2 = w2 + adjustment_of_w2
-			w3 = w3 + adjustment_of_w3
-			w4 = w4 + adjustment_of_w4
-		
-		return w1, w2, w3, w4
