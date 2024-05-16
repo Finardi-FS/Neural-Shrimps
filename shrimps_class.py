@@ -482,6 +482,7 @@ class NN_Class:
 																	# LRA: learning rate principale	 
 																	# LRB: learning rate secondario
 																	# LRD: opzione learning rate dinamico
+		
 		if not LRA:
 			LR = self._learning_rate
 
@@ -516,7 +517,8 @@ class NN_Class:
 																										# LRD : opzione learning rate dinamico
 
 		self._weights_per_epoch = np.array([weights])
-		
+		weights = np.copy(weights)
+
 		if LRD:
 			momentum = 0
 
@@ -553,7 +555,7 @@ class NN_Class:
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
 
 		plt.subplot(1,2,1)
-		x = np.linspace(0, P[0]+0.1, 1000)  
+		x = np.linspace(0, P[0]*1.1, 1000)  
 		x0 = results['correct_outputs'][idx_sample]
 		plt.grid()
 		plt.plot(x, cost_func(x, x0))
@@ -615,7 +617,7 @@ class NN_Class:
 		}			
 
 
-		for k in range(len(inputs)):                       
+		for k in range(len(inputs)):
 			weighted_sum = weights @ inputs[k]  # Prodotto scalare tra pesi allenati e input
 			predicted = self.Sigmoid(weighted_sum)
 			pred_outputs = np.append(pred_outputs, predicted) 
