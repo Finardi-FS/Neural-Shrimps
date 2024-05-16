@@ -475,39 +475,57 @@ class NN_Class:
 
 # ----------------------------------------------------------------------------- #
 
-	def SGD_method(self, weights, dataset, correct_outputs, LR = None):
+	def SGD_method(self, weights, dataset, correct_outputs, LRA = None, LRB = None, LRD = False, momentum = None):
 																	# weight:           vettore dei pesi relativi alle feature
 																	# f_input:          dataset contenente i valori delle feature per ciascun campione
 																	# correct_output:   vettore dei valori attesi per ciascun campione
-																	# LR:               learning rate
-		if not LR:
+																	# LRA: learning rate principale	 
+																	# LRB: learning rate secondario
+																	# LRD: opzione learning rate dinamico
+		if not LRA:
 			LR = self._learning_rate
 
 		for k in range(len(dataset)):                                   # ciclo sui campioni
 			
 			sample = dataset[k]                                         # prendo i valori delle feature del k-esimo campione
-			expected = correct_outputs[k]                                # prendo il valore atteso del k-esimo campione
+			expected = correct_outputs[k]                               # prendo il valore atteso del k-esimo campione
 			lin_comb = weights @ sample                                 # combinazione lineare delle feature pesate per il k-esimo campione
-			predicted = self.Sigmoid(lin_comb)                               # normalizzazione della comb. lin. attraverso la funzione Sigmoid         
+			predicted = self.Sigmoid(lin_comb)                          # normalizzazione della comb. lin. attraverso la funzione Sigmoid         
 			
 			cost_function_der = 2 * (predicted - expected)              # derivata della funzione di costo (rispetto alla variabile predicted) 
 																		# relativa alla metrica Squared Error Cost                         
 			sigmoid_der = predicted * (1 - predicted)                   # derivata del sigmoid rispetto a lin_comb
 			lc_der = sample                                             # vettore di derivate di lin_comb rispetto ai pesi w (e al bias b)
-
-			dWeights = LR * cost_function_der * sigmoid_der * lc_der    # termine differenziale di aggiustamento per ricavare i nuovi pesi
+			
+			if LRD:
+				momentum = LRA * cost_function_der * sigmoid_der * lc_der + LRB * momentum
+				dWeights = momentum
+			else:
+				dWeights = LRA * cost_function_der * sigmoid_der * lc_der    # termine differenziale di aggiustamento per ricavare i nuovi pesi
+			
 			weights -= dWeights                                         # correzione dei pesi
+		
 		self._final_weights = weights
-		return weights
+		
+		return (weights, momentum)
 
 # ----------------------------------------------------------------------------- #
 
-	def training(self, weights, inputs, correct_outputs, epochs, LR = None):
+	def training(self, weights, inputs, correct_outputs, epochs, LRA = None, LRB = None, LRD = False): 	# LRA : learning rate principale	 
+																										# LRB : learning rate secondario
+																										# LRD : opzione learning rate dinamico
+
 		self._weights_per_epoch = np.array([weights])
+		
+		if LRD:
+			momentum = 0
 
 		for e in range(epochs): #epochs-1
-
-			weights = self.SGD_method(weights, inputs, correct_outputs, LR)
+			if LRD:
+				weights, momentum = self.SGD_method(weights, inputs, correct_outputs, LRA, LRB, LRD, momentum)
+			else:
+				weights = self.SGD_method(weights, inputs, correct_outputs, LRA)[0]
+			
 			self._weights_per_epoch = np.vstack((self._weights_per_epoch, weights))
 		lin_comb = (self._weights_per_epoch @ inputs.T).T
 		P = self.Sigmoid(lin_comb)
