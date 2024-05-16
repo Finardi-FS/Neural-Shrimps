@@ -643,6 +643,8 @@ class NN_Class:
 		return (inputs, correct_outputs, pred_outputs, metrics)
 
 
+# ----------------------------------------------------------------------------- #
+
 
 	def trend_over_epochs(self, inputs, correct_outputs, weights_per_epoch):
 		P = np.empty((len(inputs),0))
@@ -655,6 +657,44 @@ class NN_Class:
 			"E" : E 
 		}
 	
+
+# ----------------------------------------------------------------------------- #
+
+
+	def ROC_curve(self, labels, prob_pred):
+		# Calcola la curva ROC per ciascuna fold e calcola l'AUC
+		mean_fpr = np.linspace(0, 1, 100)
+		tprs = []
+		aucs = []
+		fpr, tpr, _ = roc_curve(labels, prob_pred)
+		tprs.append(np.interp(mean_fpr, fpr, tpr))
+		tprs[-1][0] = 0.0
+		roc_auc = auc(fpr, tpr)
+		aucs.append(roc_auc)
+
+		# Calcola la media e la deviazione standard delle curve ROC e degli AUC
+		mean_tpr = np.mean(tprs, axis=0)
+		mean_auc = auc(mean_fpr, mean_tpr)
+		std_auc = np.std(aucs)
+
+		# Disegna la curva ROC media
+		plt.figure(figsize=(8, 6))
+		plt.plot([0, 1], [0, 1], color='gray', linestyle='--')
+		plt.plot(mean_fpr, mean_tpr, color='b', label=f'Mean ROC (AUC = {mean_auc:.2f})', lw=2)
+
+		# Imposta le etichette e la legenda
+		plt.xlabel('False Positive Rate')
+		plt.ylabel('True Positive Rate')
+		plt.title('ROC Curve')
+		plt.legend(loc='lower right', fontsize = 'large')
+		plt.grid()
+		plt.show()
+		return {'fpr':mean_fpr, 'tpr':mean_tpr}
+
+
+# ///////////////////////////////////////////////////////////////////////////// #
+# Class for Deep Learning
+# ///////////////////////////////////////////////////////////////////////////// #
 
 
 class DL_Class:
