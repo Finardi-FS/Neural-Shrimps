@@ -468,12 +468,16 @@ class NN_Class:
 	def __init__(self):
 		self._learning_rate = 0.9
 
+
 # ----------------------------------------------------------------------------- #
+
 
 	def Sigmoid(self, x):
 		return 1 / (1 + np.exp(-x))
 
+
 # ----------------------------------------------------------------------------- #
+
 
 	def SGD_method(self, weights, dataset, correct_outputs, LRA = None, LRB = None, LRD = False, momentum = None):
 																	# weight:           vettore dei pesi relativi alle feature
@@ -510,7 +514,9 @@ class NN_Class:
 		
 		return (weights, momentum)
 
+
 # ----------------------------------------------------------------------------- #
+
 
 	def training(self, weights, inputs, correct_outputs, epochs, LRA = None, LRB = None, LRD = False): 	# LRA : learning rate principale	 
 																										# LRB : learning rate secondario
@@ -542,7 +548,84 @@ class NN_Class:
 				"E"					: E
 			}
 
+
 # ----------------------------------------------------------------------------- #
+
+
+	def training_batch(self, weights, inputs, correct_outputs, epochs, LRA = None, LRB = None, LRD = False): 	# LRA : learning rate principale	 
+																										# LRB : learning rate secondario
+																										# LRD : opzione learning rate dinamico
+
+		self._weights_per_epoch = np.array([weights])
+		weights = np.copy(weights)
+
+		if LRD:
+			momentum = 0
+
+		for e in range(epochs): #epochs-1
+			if LRD:
+				weights, momentum = self.Batch_method(weights, inputs, correct_outputs, LRA, LRB, LRD, momentum)
+			else:
+				weights = self.Batch_method(weights, inputs, correct_outputs, LRA)[0]
+			
+			self._weights_per_epoch = np.vstack((self._weights_per_epoch, weights))
+		lin_comb = (self._weights_per_epoch @ inputs.T).T
+		P = self.Sigmoid(lin_comb)
+		E = np.tile(correct_outputs, (epochs+1,1)).T
+
+		return {
+				"container_weights" : self._weights_per_epoch,
+				"correct_outputs"  	: correct_outputs,
+				"epochs"            : epochs,
+				"inputs"            : inputs,
+				"P"					: P,
+				"E"					: E
+			}
+
+
+# ----------------------------------------------------------------------------- #
+
+
+	def Batch_method(self, weights, dataset, correct_outputs, LRA = None, LRB = None, LRD = False, momentum = None):
+																	# weight:           vettore dei pesi relativi alle feature
+																	# f_input:          dataset contenente i valori delle feature per ciascun campione
+																	# correct_output:   vettore dei valori attesi per ciascun campione
+																	# LRA: learning rate principale	 
+																	# LRB: learning rate secondario
+																	# LRD: opzione learning rate dinamico
+		dWeights = 0
+		
+		if not LRA:
+			LR = self._learning_rate
+
+		for k in range(len(dataset)):                                   # ciclo sui campioni
+			
+			sample = dataset[k]                                         # prendo i valori delle feature del k-esimo campione
+			expected = correct_outputs[k]                               # prendo il valore atteso del k-esimo campione
+			lin_comb = weights @ sample                                 # combinazione lineare delle feature pesate per il k-esimo campione
+			predicted = self.Sigmoid(lin_comb)                          # normalizzazione della comb. lin. attraverso la funzione Sigmoid         
+			
+			cost_function_der = 2 * (predicted - expected)              # derivata della funzione di costo (rispetto alla variabile predicted) 
+																		# relativa alla metrica Squared Error Cost                         
+			sigmoid_der = predicted * (1 - predicted)                   # derivata del sigmoid rispetto a lin_comb
+			lc_der = sample                                             # vettore di derivate di lin_comb rispetto ai pesi w (e al bias b)
+			
+			if LRD:
+				momentum = LRA * cost_function_der * sigmoid_der * lc_der + LRB * momentum
+				dWeights += momentum
+			else:
+				dWeights += LRA * cost_function_der * sigmoid_der * lc_der    # termine differenziale di aggiustamento per ricavare i nuovi pesi
+			
+		
+		weights -= dWeights                                         # correzione dei pesi
+		
+		self._final_weights = weights
+		
+		return (weights, momentum)
+	
+
+# ----------------------------------------------------------------------------- #
+
 
 	def plt_epochs(self, results, idx_sample):    
 
@@ -569,7 +652,9 @@ class NN_Class:
 		plt.title(f'(sample #{idx_sample})')
 		plt.show()
 
+
 # ----------------------------------------------------------------------------- #
+
 
 	def data_folding(self, K, Nsamples, show_kfold = False):
 		
@@ -593,7 +678,9 @@ class NN_Class:
 			jp(indices)
 		return (K, indices)
 
+
 # ----------------------------------------------------------------------------- #
+
 
 	def table_kfolds(self, dic: dict):
 		jp(pd.DataFrame(
@@ -602,7 +689,9 @@ class NN_Class:
 			columns = ['(K: {})'.format(str(i)+' of '+str(len(dic['FP']))) 
 			  			for i in range(1,len(dic['FP'])+1)]))
 
+
 # ----------------------------------------------------------------------------- #
+
 
 	def testing(self, inputs, correct_outputs, weights = None, K = 1):
 		if weights is None:
