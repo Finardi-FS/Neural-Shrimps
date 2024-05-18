@@ -354,6 +354,7 @@ class ML_Class:
 				index = avg_results['Avg'].keys()))
 		return avg_results
 	
+
 # ----------------------------------------------------------------------------- #
 
 
@@ -745,7 +746,49 @@ class NN_Class:
 			"P" : P,
 			"E" : E 
 		}
-	
+
+
+# ----------------------------------------------------------------------------- #
+
+
+	def avg_std_kfolds(self, dic: dict, table = False):
+		acc_avg = np.sum(dic['Accuracy'])/len(dic['Accuracy'])
+		acc_std = np.std(dic['Accuracy'])
+
+		sen_avg = np.sum(dic['Sensitivity'])/len(dic['Sensitivity'])
+		sen_std = np.std(dic['Sensitivity'])
+
+		spe_avg = np.sum(dic['Specificity'])/len(dic['Specificity'])
+		spe_std = np.std(dic['Specificity'])
+
+		FN_avg = np.sum(dic['FN'])/len(dic['FN'])
+		FN_std = np.std(dic['FN'])
+
+		FP_avg = np.sum(dic['FP'])/len(dic['FP'])
+		FP_std = np.std(dic['FP'])
+
+		avg_results = {
+			'Avg': {'Accuracy':         acc_avg,
+					'Sensitivity':      sen_avg,
+					'Specificity':      spe_avg,
+					'FN':   			FN_avg,
+					'FP':   			FP_avg
+					},
+			'Std': {'Accuracy':         acc_std,
+					'Sensitivity':      sen_std,
+					'Specificity':      spe_std,
+					'FN':   			FN_std,
+					'FP':   			FP_std
+		   			}
+			}
+		if table:
+			jp(pd.DataFrame({
+				'Avg': avg_results['Avg'].values(),
+				'Std': avg_results['Std'].values()
+				}, 
+				index = avg_results['Avg'].keys()))
+		return avg_results
+		
 
 # ----------------------------------------------------------------------------- #
 
