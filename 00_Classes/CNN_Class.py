@@ -179,7 +179,7 @@ class MyCNN:
 		for k in range(num_filters):
 			filter = W[k, :, :]
 			filter = np.rot90(filter, 2)
-			y[k, :, :] = convolve2d(x[k, :, :], filter, mode='valid')
+			y[k, :, :] = convolve2d(x, filter, mode='valid')
 
 		return y
 
