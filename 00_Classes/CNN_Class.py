@@ -215,7 +215,7 @@ class MyCNN:
 				for j in range(n):
 					if k >= M:
 						continue
-					clim = np.max(np.abs(A[k, :]))
+					clim = np.max(np.abs(A[:, k]))
 					if opt_normalize:
 						array[buf + i * (sz + buf):buf + i * (sz + buf) + sz,
 							buf + j * (sz + buf):buf + j * (sz + buf) + sz] = A[:, k].reshape(sz, sz) / clim
