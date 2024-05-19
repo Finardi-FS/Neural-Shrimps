@@ -155,31 +155,31 @@ class MyCNN:
 # ----------------------------------------------------------------------------- #
 
 def Pool(self, x):
-    xrow, xcol, numFilters = x.shape
-    y = np.zeros((xrow // 2, xcol // 2, numFilters))  # Divisione intera per 2
+    numFilters, xrow, xcol = x.shape
+    y = np.zeros((numFilters, xrow // 2, xcol // 2))  # Divisione intera per 2
     
     for k in range(numFilters):
-        filter = np.ones((2, 2)) / (2 * 2)
-        image = convolve2d(x[:, :, k], filter, mode='valid')
-        y[:, :, k] = image[0::2, 0::2]  # prendo la media e la metto nel pixel che scelgo ogni 4
+        filter = np.ones((2, 2)) / (2 * 2)            # pooling media
+        image = convolve2d(x[k, :, :], filter, mode='valid')
+        y[k, :, :] = image[0::2, 0::2]  # prendo la media e la metto nel pixel che scelgo ogni 4
         
     return y
 
 # ----------------------------------------------------------------------------- #
 
 def Conv(self, x, W):
-    wrow, wcol, numFilters = W.shape
-    xrow, xcol, _ = x.shape
+    numFilters, wrow, wcol = W.shape
+    _, xrow, xcol = x.shape
 
     yrow = xrow - wrow + 1
     ycol = xcol - wcol + 1
 
-    y = np.zeros((yrow, ycol, numFilters))
+    y = np.zeros((numFilters, yrow, ycol))
 
     for k in range(numFilters):
-        filter = W[:, :, k]
+        filter = W[k, :, :]
         filter = np.rot90(filter, 2)
-        y[:, :, k] = convolve2d(x[:, :, k], filter, mode='valid')
+        y[k, :, :] = convolve2d(x[k, :, :], filter, mode='valid')
 
     return y
 
