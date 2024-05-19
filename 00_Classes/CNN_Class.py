@@ -2,6 +2,7 @@ import numpy as np
 import gzip
 import random
 from scipy.signal import convolve2d
+import matplotlib.pyplot as plt
 
 
 class MyCNN:
@@ -180,7 +181,7 @@ class MyCNN:
 			
 		return y
 
-	# ----------------------------------------------------------------------------- #
+# ----------------------------------------------------------------------------- #
 
 	def Conv(self, x, W):
 		num_filters, wrow, wcol = W.shape
@@ -197,5 +198,75 @@ class MyCNN:
 			y[k, :, :] = convolve2d(x, filter, mode='valid')
 
 		return y
+
+# ----------------------------------------------------------------------------- #
+
+	def display_network(self, A, title, opt_normalize=True, opt_graycolor=True, cols=None, opt_colmajor=False):
+		# Disabilita i warning (equivalente in Python)
+		import warnings
+		warnings.filterwarnings("ignore")
+
+		# Sottrae la media
+		A = A - np.mean(A)
+
+		# Imposta la mappa di colori in scala di grigi se richiesto
+		if opt_graycolor:
+			plt.set_cmap('gray')
+
+		L, M = A.shape
+		sz = int(np.sqrt(L))
+		buf = 1
+
+		if cols is None:
+			if int(np.sqrt(M))**2 != M:
+				n = int(np.ceil(np.sqrt(M)))
+				while M % n != 0 and n < 1.2 * np.sqrt(M):
+					n += 1
+				m = int(np.ceil(M / n))
+			else:
+				n = int(np.sqrt(M))
+				m = n
+		else:
+			n = cols
+			m = int(np.ceil(M / n))
+
+		array = -np.ones((buf + m * (sz + buf), buf + n * (sz + buf)))
+
+		if not opt_colmajor:
+			k = 0
+			for i in range(m):
+				for j in range(n):
+					if k >= M:
+						continue
+					clim = np.max(np.abs(A[k, :]))
+					if opt_normalize:
+						array[buf + i * (sz + buf):buf + i * (sz + buf) + sz,
+							buf + j * (sz + buf):buf + j * (sz + buf) + sz] = A[:, k].reshape(sz, sz) / clim
+					else:
+						array[buf + i * (sz + buf):buf + i * (sz + buf) + sz,
+							buf + j * (sz + buf):buf + j * (sz + buf) + sz] = A[:, k].reshape(sz, sz) / np.max(np.abs(A))
+					k += 1
+		else:
+			k = 0
+			for j in range(n):
+				for i in range(m):
+					if k >= M:
+						continue
+					clim = np.max(np.abs(A[:, k]))
+					if opt_normalize:
+						array[buf + i * (sz + buf):buf + i * (sz + buf) + sz,
+							buf + j * (sz + buf):buf + j * (sz + buf) + sz] = A[:, k].reshape(sz, sz) / clim
+					else:
+						array[buf + i * (sz + buf):buf + i * (sz + buf) + sz,
+							buf + j * (sz + buf):buf + j * (sz + buf) + sz] = A[:, k].reshape(sz, sz)
+					k += 1
+
+		plt.imshow(array, vmin=-1, vmax=1)
+		plt.axis('off')
+		plt.title(title)
+		plt.show()
+
+		# Riabilita i warning
+		warnings.filterwarnings("default")
 
 # ----------------------------------------------------------------------------- #
