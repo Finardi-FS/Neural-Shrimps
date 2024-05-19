@@ -847,9 +847,7 @@ class DL_Class:
 # ----------------------------------------------------------------------------- #
 
 	def Softmax(self, x: np.array):
-		# exp = np.exp(x - np.max(x))  # Sottrarre il massimo valore per stabilizzare l'output
-		# return exp / np.sum(exp)
-		exp = np.exp(x)
+		exp = np.exp(x - np.max(x))
 		return exp / np.sum(exp)
 
 # ----------------------------------------------------------------------------- #
