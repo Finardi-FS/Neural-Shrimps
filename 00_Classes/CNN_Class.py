@@ -146,29 +146,6 @@ class MyCNN:
 
 	
 # ----------------------------------------------------------------------------- #
-	
-	def Test_DL(self, w_per_layer, input_image, correct_outputs):
-		
-		N = len(correct_outputs)
-		container_output_prob = [[] for _ in range(N)]							
-
-		# ciclo ad ogni campione 
-		for k in range(N):														
-			a = input_image[:, :, k].flatten()					
-																																					
-			for i, w in enumerate(w_per_layer):								
-				h = w @ a											 
-																
-				if i != (len(w_per_layer) - 1):							
-					a = self.ReLU(h)								
-																
-				else:
-					a = self.Softmax(h)																		
-					container_output_prob[k] = a								
-		
-		return container_output_prob
-	
-# ----------------------------------------------------------------------------- #
 
 	def Pool(self, x):
 		numFilters, xrow, xcol = x.shape
