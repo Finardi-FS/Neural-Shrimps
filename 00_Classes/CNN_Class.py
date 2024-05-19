@@ -168,15 +168,15 @@ class MyCNN:
 	# ----------------------------------------------------------------------------- #
 
 	def Conv(self, x, W):
-		numFilters, wrow, wcol = W.shape
-		_, xrow, xcol = x.shape
+		num_filters, wrow, wcol = W.shape
+		xrow, xcol = x.shape
 
 		yrow = xrow - wrow + 1
 		ycol = xcol - wcol + 1
 
-		y = np.zeros((numFilters, yrow, ycol))
+		y = np.zeros((num_filters, yrow, ycol))
 
-		for k in range(numFilters):
+		for k in range(num_filters):
 			filter = W[k, :, :]
 			filter = np.rot90(filter, 2)
 			y[k, :, :] = convolve2d(x[k, :, :], filter, mode='valid')
