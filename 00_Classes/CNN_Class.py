@@ -1,6 +1,8 @@
 import numpy as np
 import gzip
 import random
+from scipy.signal import convolve2d
+
 
 class MyCNN:
 
@@ -149,3 +151,36 @@ class MyCNN:
 					container_output_prob[k] = a								
 		
 		return container_output_prob
+	
+# ----------------------------------------------------------------------------- #
+
+def Pool(self, x):
+    xrow, xcol, numFilters = x.shape
+    y = np.zeros((xrow // 2, xcol // 2, numFilters))  # Divisione intera per 2
+    
+    for k in range(numFilters):
+        filter = np.ones((2, 2)) / (2 * 2)
+        image = convolve2d(x[:, :, k], filter, mode='valid')
+        y[:, :, k] = image[0::2, 0::2]  # prendo la media e la metto nel pixel che scelgo ogni 4
+        
+    return y
+
+# ----------------------------------------------------------------------------- #
+
+def Conv(self, x, W):
+    wrow, wcol, numFilters = W.shape
+    xrow, xcol, _ = x.shape
+
+    yrow = xrow - wrow + 1
+    ycol = xcol - wcol + 1
+
+    y = np.zeros((yrow, ycol, numFilters))
+
+    for k in range(numFilters):
+        filter = W[:, :, k]
+        filter = np.rot90(filter, 2)
+        y[:, :, k] = convolve2d(x[:, :, k], filter, mode='valid')
+
+    return y
+
+# ----------------------------------------------------------------------------- #
