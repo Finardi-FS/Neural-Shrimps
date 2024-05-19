@@ -162,9 +162,9 @@ class MyNN:
 				dWeights += momentum
 			else:
 				dWeights += LRA * cost_function_der * sigmoid_der * lc_der    # termine differenziale di aggiustamento per ricavare i nuovi pesi
-			
+	
 		
-		weights -= dWeights                                         # correzione dei pesi
+		weights -= dWeights / len(dataset)                                         # correzione dei pesi
 		
 		self._final_weights = weights
 		
