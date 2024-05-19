@@ -105,7 +105,7 @@ class MyDL:
 	
 	def Test_DL(self, w_per_layer, input_image, correct_outputs):
 		
-		N = len(input_image)
+		N = len(correct_outputs)
 		container_output_prob = [[] for _ in range(N)]							
 
 		# ciclo ad ogni campione 
