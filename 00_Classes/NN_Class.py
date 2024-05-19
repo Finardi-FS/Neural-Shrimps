@@ -10,7 +10,7 @@ import jupyprint.jupyprint as jp
 # Class for Neural Nerwork
 # ///////////////////////////////////////////////////////////////////////////// #
 
-class NN_Class:
+class MyNN:
 
 	def __init__(self):
 		self._learning_rate = 0.9

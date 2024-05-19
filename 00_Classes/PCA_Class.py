@@ -7,7 +7,7 @@ import jupyprint.jupyprint as jp
 # Class for Principal Component Analysis (PCA)
 # ///////////////////////////////////////////////////////////////////////////// #
 
-class PCA_Class:
+class MyPCA:
 
 	def __init__(self, data_int, data_ext = None, feature_names = None):
 

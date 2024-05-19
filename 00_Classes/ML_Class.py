@@ -11,7 +11,7 @@ import jupyprint.jupyprint as jp
 # Class for Machine Learning 
 # ///////////////////////////////////////////////////////////////////////////// #
 
-class ML_Class:
+class MyML:
 
 	def __init__(self, data, labels):
 		self._data = data
