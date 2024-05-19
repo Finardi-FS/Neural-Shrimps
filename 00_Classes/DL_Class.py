@@ -42,7 +42,7 @@ class MyDL:
 
 	def SGD_DL(self, w_per_layer, input_image, correct_outputs, LR = 0.001):
 
-		N = len(input_image)													# Numero di campioni.
+		N = len(correct_outputs)													# Numero di campioni.
 		h = [[] for _ in range(N)]												# Lista di combinazioni lineari tra pesi e inputs:\
 																				# Righe		: 	combinazioni lineari per campione.\
 																				# Colonne	: 	combinazioni lineare tra gli input e i pesi\ 
