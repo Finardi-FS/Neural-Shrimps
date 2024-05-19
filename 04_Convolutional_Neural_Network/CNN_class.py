@@ -47,6 +47,6 @@ def Softmax(x: np.array):
 
 # ----------------------------------------------------------------------------- #
 
-def rng(x):
-    np.random.seed(x)
-    random.seed(x)
+# def rng(x):
+#     np.random.seed(x)
+#     random.seed(x)

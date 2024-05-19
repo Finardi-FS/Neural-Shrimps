@@ -29,12 +29,18 @@ class MyDL:
 # ----------------------------------------------------------------------------- #
 
 	def Softmax(self, x: np.array):
-		exp = np.exp(x - np.max(x))
+		max_x = np.max(x)
+		
+		# Verifica se max_x supera una soglia per evitare l'overflow
+		if max_x > 709:  # 709 è scelto perché np.exp(710) risulta in overflow
+			x = x - max_x
+		
+		exp = np.exp(x)
 		return exp / np.sum(exp)
 
 # ----------------------------------------------------------------------------- #
 
-	def DeepLearning(self, w_per_layer, input_image, correct_outputs, LR = 0.001):
+	def SGD_DL(self, w_per_layer, input_image, correct_outputs, LR = 0.001):
 
 		N = len(input_image)													# Numero di campioni.
 		h = [[] for _ in range(N)]												# Lista di combinazioni lineari tra pesi e inputs:\
@@ -94,3 +100,26 @@ class MyDL:
 																				# i pesi finali.
 
 		return (container_weights, container_output_prob)
+	
+# ----------------------------------------------------------------------------- #
+	
+	def Test_DL(self, w_per_layer, input_image, correct_outputs):
+		
+		N = len(input_image)
+		container_output_prob = [[] for _ in range(N)]							
+
+		# ciclo ad ogni campione 
+		for k in range(N):														
+			a = input_image[:, :, k].flatten()					
+																																					
+			for i, w in enumerate(w_per_layer):								
+				h = w @ a											 
+																
+				if i != (len(w_per_layer) - 1):							
+					a = self.ReLU(h)								
+																
+				else:
+					a = self.Softmax(h)																		
+					container_output_prob[k] = a								
+		
+		return container_output_prob
