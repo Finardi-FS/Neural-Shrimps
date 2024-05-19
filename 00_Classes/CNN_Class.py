@@ -30,7 +30,7 @@ class MyCNN:
 
 # ----------------------------------------------------------------------------- #
 
-	def loadMNISTLabels(self, filename):
+	def load_MNIST_labels(self, filename):
 		with gzip.open(filename, 'r') as f:
 			# first 4 bytes is a magic number
 			magic_number    = int.from_bytes(f.read(4), 'big')
@@ -62,7 +62,7 @@ class MyCNN:
 
 # ----------------------------------------------------------------------------- #
 
-	def rng(self, x):
+	def Rng(self, x):
 		np.random.seed(x)
 		random.seed(x)
 
@@ -154,33 +154,33 @@ class MyCNN:
 	
 # ----------------------------------------------------------------------------- #
 
-def Pool(self, x):
-    numFilters, xrow, xcol = x.shape
-    y = np.zeros((numFilters, xrow // 2, xcol // 2))  # Divisione intera per 2
-    
-    for k in range(numFilters):
-        filter = np.ones((2, 2)) / (2 * 2)            # pooling media
-        image = convolve2d(x[k, :, :], filter, mode='valid')
-        y[k, :, :] = image[0::2, 0::2]  # prendo la media e la metto nel pixel che scelgo ogni 4
-        
-    return y
+	def Pool(self, x):
+		numFilters, xrow, xcol = x.shape
+		y = np.zeros((numFilters, xrow // 2, xcol // 2))  # Divisione intera per 2
+		
+		for k in range(numFilters):
+			filter = np.ones((2, 2)) / (2 * 2)            # pooling media
+			image = convolve2d(x[k, :, :], filter, mode='valid')
+			y[k, :, :] = image[0::2, 0::2]  # prendo la media e la metto nel pixel che scelgo ogni 4
+			
+		return y
 
-# ----------------------------------------------------------------------------- #
+	# ----------------------------------------------------------------------------- #
 
-def Conv(self, x, W):
-    numFilters, wrow, wcol = W.shape
-    _, xrow, xcol = x.shape
+	def Conv(self, x, W):
+		numFilters, wrow, wcol = W.shape
+		_, xrow, xcol = x.shape
 
-    yrow = xrow - wrow + 1
-    ycol = xcol - wcol + 1
+		yrow = xrow - wrow + 1
+		ycol = xcol - wcol + 1
 
-    y = np.zeros((numFilters, yrow, ycol))
+		y = np.zeros((numFilters, yrow, ycol))
 
-    for k in range(numFilters):
-        filter = W[k, :, :]
-        filter = np.rot90(filter, 2)
-        y[k, :, :] = convolve2d(x[k, :, :], filter, mode='valid')
+		for k in range(numFilters):
+			filter = W[k, :, :]
+			filter = np.rot90(filter, 2)
+			y[k, :, :] = convolve2d(x[k, :, :], filter, mode='valid')
 
-    return y
+		return y
 
 # ----------------------------------------------------------------------------- #
