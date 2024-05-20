@@ -292,6 +292,8 @@ class MyNN:
 			'FNR'          : 0,
 			'TP'			: 0,
 			'TN'			: 0,
+			'FN'			: 0,
+			'FP'			: 0
 		}			
 
 
@@ -303,20 +305,24 @@ class MyNN:
 			# Caso 0 -> Negative
 			if correct_outputs[k] == 0 and predicted < 0.5:
 				metrics['accuracy'] += 1 / len(correct_outputs)
+				metrics['TN'] += 1 / len(inputs)
 				metrics['specificity'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
 
 			# Caso 1 -> Positive
 			if correct_outputs[k] == 1 and predicted >= 0.5:
 				metrics['accuracy'] += 1 / len(correct_outputs)
 				metrics['sensitivity'] += 1 / np.sum(correct_outputs)
+				metrics['TP'] += 1 / len(inputs)
 
 			# Caso 1 -> Negative
 			if correct_outputs[k] == 1 and predicted < 0.5:
 				metrics['FNR'] += 1 / np.sum(correct_outputs)
+				metrics['FN'] += 1 / len(inputs)
 
 			# Caso 0 -> Positive
 			if correct_outputs[k] == 0 and predicted >= 0.5:
 				metrics['FPR'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
+				metrics['FP'] += 1 / len(inputs)
 
 		return (inputs, correct_outputs, pred_outputs, metrics)
 
@@ -414,3 +420,22 @@ class MyNN:
 		plt.show()
 
 		return {'fpr': mean_fpr, 'tpr': mean_tpr}
+	
+
+	# ----------------------------------------------------------------------------- #
+
+
+	def confusion_matrix(self, dic: dict, table = True):
+		confusion_Matrix = np.zeros((2,2))
+		confusion_Matrix[0,0] = round(dic['TP'], 6) # TP
+		confusion_Matrix[1,0] = round(dic['FP'], 6)
+		confusion_Matrix[0,1] = round(dic['FN'], 6)
+		confusion_Matrix[1,1] = round(dic['TN'], 6) # TN
+
+		if table:
+			jp("### Confusion Matrix:")
+			jp(pd.DataFrame(
+				confusion_Matrix, 
+				index = ['Actual P', 'Actual N'], 
+				columns = ['Predicted P', 'Predicted N']))
+		return confusion_Matrix
