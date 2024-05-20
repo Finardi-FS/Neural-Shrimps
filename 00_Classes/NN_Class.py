@@ -174,29 +174,69 @@ class MyNN:
 # ----------------------------------------------------------------------------- #
 
 
+	# def plt_epochs(self, results, idx_sample):    
+
+	# 	def cost_func(x, x0):
+	# 		return (x - x0)**2
+
+	# 	plt.figure(figsize=(15,8))
+
+	# 	P = self.Sigmoid(results['container_weights'] @ results['inputs'][idx_sample])
+	# 	E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
+
+	# 	plt.subplot(1,2,1)
+	# 	x = np.linspace(0, P[0]*1.1, 1000)  
+	# 	x0 = results['correct_outputs'][idx_sample]
+	# 	plt.grid()
+	# 	plt.plot(x, cost_func(x, x0))
+	# 	plt.scatter(E[0],0, color='red', linewidth=5)
+	# 	plt.plot(P, cost_func(P, E), marker = 'o')
+	# 	plt.title(f'Cost function minimization (sample #{idx_sample})')
+
+	# 	plt.subplot(1,2,2)
+	# 	plt.grid()
+	# 	plt.plot(np.arange(1, results['epochs']+2), 2*(P - E))
+	# 	plt.title(f'(sample #{idx_sample})')
+	# 	plt.show()
+
+
 	def plt_epochs(self, results, idx_sample):    
 
 		def cost_func(x, x0):
 			return (x - x0)**2
 
-		plt.figure(figsize=(15,8))
+		plt.figure(figsize=(18, 8))
 
 		P = self.Sigmoid(results['container_weights'] @ results['inputs'][idx_sample])
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
 
-		plt.subplot(1,2,1)
-		x = np.linspace(0, P[0]*1.1, 1000)  
+		# Plot della funzione di costo
+		plt.subplot(1, 2, 1)
+		x = np.linspace(0, P[0]*1.1, 1000)
 		x0 = results['correct_outputs'][idx_sample]
-		plt.grid()
-		plt.plot(x, cost_func(x, x0))
-		plt.scatter(E[0],0, color='red', linewidth=5)
-		plt.plot(P, cost_func(P, E), marker = 'o')
-		plt.title(f'Cost function minimization (sample #{idx_sample})')
+		plt.grid(True, linestyle='--', linewidth=0.5)
+		plt.plot(x, cost_func(x, x0), label='Funzione di costo', linewidth = 2)
+		plt.scatter(E[0], 0, s=100, color = 'red', zorder=5, label='Output corretto')
+		plt.plot(P, cost_func(P, E), marker='o', label='Output stimato', linewidth = 2, ms=8)
+		plt.title('Funzione di costo', fontsize=22)
+		plt.xlabel('Output stimato', fontsize=18)
+		plt.ylabel('Costo', fontsize=18)
+		plt.legend(fontsize=18)
+		plt.xticks(fontsize=12)
+		plt.yticks(fontsize=12)
+		
+		# Plot della loss function in funzione delle epoche
+		plt.subplot(1, 2, 2)
+		plt.grid(True, linestyle='--', linewidth=0.5)
+		plt.plot(np.arange(1, results['epochs'] + 2), 2 * (P - E), label='Loss Function', color='purple', marker='o', linewidth = 2, ms =8)
+		plt.title(f'Loss Function al variare delle epoche', fontsize=22)
+		plt.xlabel('Epoche', fontsize=18)
+		plt.ylabel('Loss', fontsize=18)
+		plt.legend(fontsize=18)
+		plt.xticks(fontsize=12)
+		plt.yticks(fontsize=12)
 
-		plt.subplot(1,2,2)
-		plt.grid()
-		plt.plot(np.arange(1, results['epochs']+2), 2*(P - E))
-		plt.title(f'(sample #{idx_sample})')
+		plt.tight_layout()
 		plt.show()
 
 
