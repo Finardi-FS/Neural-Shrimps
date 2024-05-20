@@ -205,7 +205,7 @@ class MyNN:
 		def cost_func(x, x0):
 			return (x - x0)**2
 
-		plt.figure(figsize=(18, 8))
+		plt.figure(figsize=(16, 8))
 
 		P = self.Sigmoid(results['container_weights'] @ results['inputs'][idx_sample])
 		E = np.ones(len(P)) * results['correct_outputs'][idx_sample]
@@ -396,15 +396,19 @@ class MyNN:
 		std_auc = np.std(aucs)
 
 		# Disegna la curva ROC media
-		plt.figure(figsize=(8, 6))
-		plt.plot([0, 1], [0, 1], color='gray', linestyle='--')
-		plt.plot(mean_fpr, mean_tpr, color='b', label=f'Mean ROC (AUC = {mean_auc:.2f})', lw=2)
+		plt.figure(figsize=(10, 8))
+		plt.plot([0, 1], [0, 1], color='gray', linestyle='--', linewidth=2)
+		plt.plot(mean_fpr, mean_tpr, color='b', label=f'Mean ROC (AUC = {mean_auc:.2f})', linewidth=2)
 
 		# Imposta le etichette e la legenda
-		plt.xlabel('False Positive Rate')
-		plt.ylabel('True Positive Rate')
-		plt.title('ROC Curve')
-		plt.legend(loc='lower right', fontsize = 'large')
-		plt.grid()
+		plt.xlabel('False Positive Rate', fontsize=18)
+		plt.ylabel('True Positive Rate', fontsize=18)
+		plt.title('Curva ROC', fontsize=22)
+		plt.legend(loc='lower right', fontsize=18)
+		plt.xticks(fontsize=12)
+		plt.yticks(fontsize=12)
+		plt.grid(True, linestyle='--', linewidth=0.5)
+		plt.tight_layout()
 		plt.show()
-		return {'fpr':mean_fpr, 'tpr':mean_tpr}
+
+		return {'fpr': mean_fpr, 'tpr': mean_tpr}
