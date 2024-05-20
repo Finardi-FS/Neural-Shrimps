@@ -273,8 +273,8 @@ class MyNN:
 		jp(pd.DataFrame(
 			dic.values(), 
 			index = dic.keys(), 
-			columns = ['(K: {})'.format(str(i)+' of '+str(len(dic['FP']))) 
-			  			for i in range(1,len(dic['FP'])+1)]))
+			columns = ['(K: {})'.format(str(i)+' of '+str(len(dic['FPR']))) 
+			  			for i in range(1,len(dic['FPR'])+1)]))
 
 
 # ----------------------------------------------------------------------------- #
@@ -288,8 +288,10 @@ class MyNN:
 			'accuracy'    : 0,
 			'sensitivity' : 0,
 			'specificity' : 0,
-			'FP'          : 0,
-			'FN'          : 0
+			'FPR'          : 0,
+			'FNR'          : 0,
+			'TP'			: 0,
+			'TN'			: 0,
 		}			
 
 
@@ -310,11 +312,11 @@ class MyNN:
 
 			# Caso 1 -> Negative
 			if correct_outputs[k] == 1 and predicted < 0.5:
-				metrics['FN'] += 1 / np.sum(correct_outputs)
+				metrics['FNR'] += 1 / np.sum(correct_outputs)
 
 			# Caso 0 -> Positive
 			if correct_outputs[k] == 0 and predicted >= 0.5:
-				metrics['FP'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
+				metrics['FPR'] += 1 / (len(correct_outputs)-np.sum(correct_outputs))
 
 		return (inputs, correct_outputs, pred_outputs, metrics)
 
@@ -347,24 +349,24 @@ class MyNN:
 		spe_avg = np.sum(dic['Specificity'])/len(dic['Specificity'])
 		spe_std = np.std(dic['Specificity'])
 
-		FN_avg = np.sum(dic['FN'])/len(dic['FN'])
-		FN_std = np.std(dic['FN'])
+		FNR_avg = np.sum(dic['FNR'])/len(dic['FNR'])
+		FNR_std = np.std(dic['FNR'])
 
-		FP_avg = np.sum(dic['FP'])/len(dic['FP'])
-		FP_std = np.std(dic['FP'])
+		FPR_avg = np.sum(dic['FPR'])/len(dic['FPR'])
+		FPR_std = np.std(dic['FPR'])
 
 		avg_results = {
 			'Avg': {'Accuracy':         acc_avg,
 					'Sensitivity':      sen_avg,
 					'Specificity':      spe_avg,
-					'FN':   			FN_avg,
-					'FP':   			FP_avg
+					'FNR':   			FNR_avg,
+					'FPR':   			FPR_avg
 					},
 			'Std': {'Accuracy':         acc_std,
 					'Sensitivity':      sen_std,
 					'Specificity':      spe_std,
-					'FN':   			FN_std,
-					'FP':   			FP_std
+					'FNR':   			FNR_std,
+					'FPR':   			FPR_std
 		   			}
 			}
 		if table:
