@@ -428,14 +428,14 @@ class MyNN:
 	def confusion_matrix(self, dic: dict, table = True):
 		confusion_Matrix = np.zeros((2,2))
 		confusion_Matrix[0,0] = round(dic['TP'], 6) # TP
-		confusion_Matrix[1,0] = round(dic['FP'], 6)
-		confusion_Matrix[0,1] = round(dic['FN'], 6)
+		confusion_Matrix[1,0] = round(dic['FN'], 6)
+		confusion_Matrix[0,1] = round(dic['FP'], 6)
 		confusion_Matrix[1,1] = round(dic['TN'], 6) # TN
 
 		if table:
 			jp("### Confusion Matrix:")
 			jp(pd.DataFrame(
 				confusion_Matrix, 
-				index = ['Actual P', 'Actual N'], 
-				columns = ['Predicted P', 'Predicted N']))
+				index = ['Predicted P', 'Predicted N'], 
+				columns = ['Actual P', 'Actual N']))
 		return confusion_Matrix
